@@ -1,4 +1,15 @@
-Made dist-ivy, dist-ivy-beaut, dist-ve, and dist-ve-beaut variants.
+# Notes while analysing the AIO size difference with Ivy
+
+The setup for AIO from where I got these samples can be reproduced by following these steps:
+```
+git clone https://github.com/filipesilva/angular
+cd angular
+git checkout aio-ivy-size-diff
+cd aio
+yarn
+```
+
+I made dist-ivy, dist-ivy-beaut, dist-ve, and dist-ve-beaut variants by running `ng build --configuration=stable --output-path dist-ivy-beaut`. The output path changed for each variant.
 
 The ve/ivy variants were made by flipping the `angularCompilerOptions.enableIvy` flag in `aio/tsconfig.json`.
 
@@ -10,6 +21,8 @@ terserOptions.mangle = false;           // <-- add this
 terserOptions.output.beautify = true;   // <-- and this
 extraMinimizers.push(new TerserPlugin({
 ```
+
+## Sizes
 
 Here's the comparison between baseline Ivy and VE:
 
@@ -117,5 +130,41 @@ $ du -ach --max-depth=1 ./dist-ve-beaut/*.js
 1.6M    total
 ```
 
+## Ivy size decreases
+
+### Differences between production version and beautified version
+
 Going by the unminified results, we should expect to find size differences in the same modules.
 However, that's not the case: only main.js has any size changes.
+
+If the total size for the beautified `api-api-list-module.js`, `code-code-tabs-module.js`, and `resource-resource-list-module.js` didn't really change, then instead it means that in those files Ivy benefitted more from mangling and whitespace removal than VE.
+
+
+### Differences between production versions
+
+I tried to analyse the diffs for `api-api-list-module.js` and found a couple of things.
+
+#### Chained property access
+
+Using repetitions of `[\w$]+\.[\w$]+` regex to find property accesses, whose names cannot be mangled, we can count how many there are.
+
+- `[\w$]+\.[\w$]+`: Ivy has 227, VE has 292
+- `[\w$]+\.[\w$]+\.[\w$]+`:, Ivy has 28, VE has 39
+- `[\w$]+\.[\w$]+\.[\w$]+\.[\w$]+`:, Ivy has 1, VE has 12
+
+More property accesses means less benefit from mangling. This should be the bulk of the size difference.
+
+#### Primitive usage
+
+Primitives can't be renamed, so more of them means less opportunities for size savings.
+
+- `null`: Ivy has 2, VE has 140
+- `this`: Ivy has 70, VE has 70
+- `return`: Ivy has 13, VE has 14
+- strings: Ivy has 141, VE has 150, 
+  - VE seems to have `"document"`, `"keydown.escape"`, `document:keydown.escape"`, `"document.click"`, and some others in generated code that Ivy doesn't
+
+
+## Ivy size increases
+
+`main.js` increases in size for Ivy
