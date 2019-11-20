@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[22],{H6rO:function(n,e,o){"use strict";o.r(e),o.d(e,"DiscoveryModule",(function(){return u}));var r=o("PXUV"),t=o("MnlZ"),i=(o("LN3Q"),o("ePD8")),c=o("fXoL");let u=(()=>{class n{}return n.ɵmod=c["ɵɵdefineNgModule"]({type:n}),n.ɵinj=c["ɵɵdefineInjector"]({factory:function(e){return new(e||n)},imports:[[t.a,r.a,i.b]]}),n})()}}]);
