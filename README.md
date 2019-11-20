@@ -261,5 +261,3 @@ For `main.js`, sourcemaps showed the following split of toplevel contributors:
   - +23.18  KB total
 
 The end result is that code for user sources is smaller, but Angular libraries are bigger.
-
-### something, hopefully
