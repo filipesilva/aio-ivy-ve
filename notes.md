@@ -1,5 +1,7 @@
 # Notes while analysing the AIO size difference with Ivy
 
+The samples analysed below can be found at https://github.com/filipesilva/aio-ivy-ve.
+
 The setup for AIO from where I got these samples can be reproduced by following these steps:
 ```
 git clone https://github.com/filipesilva/angular
@@ -167,4 +169,4 @@ Primitives can't be renamed, so more of them means less opportunities for size s
 
 ## Ivy size increases
 
-`main.js` increases in size for Ivy
+`main.js` increases in size for Ivy by 20K.
