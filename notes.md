@@ -198,24 +198,24 @@ Primitives can't be renamed, so more of them means less opportunities for size s
 For `api-api-list-module.js`, sourcemaps showed the following split:
 
 - dist-ivy/api-api-list-module.js
-  - 2.5 KB api-list.component.ts
-  - 1.23 KB api-list.component.html
-  - 938 B api.service.ts
-  - 907 B api-list.component.ts.pre-build-optimizer.js
-  - 369 B unmapped
-  - 160 B api-list.module.ts
-  - 65 B api-list.module.ts.pre-build-optimizer.js
-  - 53 B api.service.ts.pre-build-optimizer.js
-  - 6.22 KB total  
-- dist-veapi-api-list-module-ngfactory.js
-  - 3.28 KB api-list.component.html 
-  - 2.41 KB api-list.component.ts
-  - 846 B api.service.ts
-  - 743 B api-list.component.ngfactory.js.pre-build-optimizer.js
-  - 657 B api-list.module.ngfactory.js.pre-build-optimizer.js
-  - 349 B unmapped
-  - 53 B api-list.module.ts
-  - 8.33 KB total  
+  - 2.5   KB api-list.component.ts
+  - 1.23  KB api-list.component.html
+  - 938   B api.service.ts
+  - 907   B api-list.component.ts.pre-build-optimizer.js
+  - 369   B unmapped
+  - 160   B api-list.module.ts
+  - 65    B api-list.module.ts.pre-build-optimizer.js
+  - 53    B api.service.ts.pre-build-optimizer.js
+  - 6.22  KB total  
+- dist-ve/api-api-list-module-ngfactory.js
+  - 3.28  KB api-list.component.html 
+  - 2.41  KB api-list.component.ts
+  - 846   B api.service.ts
+  - 743   B api-list.component.ngfactory.js.pre-build-optimizer.js
+  - 657   B api-list.module.ngfactory.js.pre-build-optimizer.js
+  - 349   B unmapped
+  - 53    B api-list.module.ts
+  - 8.33  KB total  
 
 
 ## Ivy size increases
@@ -227,38 +227,38 @@ I tried to analyse the diffs for `main.js` (+23505) and found a couple of things
 For `main.js`, sourcemaps showed the following split of toplevel contributors:
 
 - dist-ivy/main.js
-  - 130.29 KB @angular/core
-  - 66.23  KB @angular/animations
-  - 59.42  KB @angular/material
-  - 35.11  KB @angular/common
-  - 30.31  KB @angular/cdk
-  - 21.66  KB @angular/platform-browser
-  - 41.37  KB rxjs
-  - 56.86  KB src
-  - 10.64  KB unmapped
-  - 462.12 KB total  
+  - 130.29  KB @angular/core
+  - 66.23   KB @angular/animations
+  - 59.42   KB @angular/material
+  - 35.11   KB @angular/common
+  - 30.31   KB @angular/cdk
+  - 21.66   KB @angular/platform-browser
+  - 41.37   KB rxjs
+  - 56.86   KB src
+  - 10.64   KB unmapped
+  - 462.12  KB total
 - dist-ve/main.js
-  - 116.38 KB @angular/core
-  - 66.43  KB @angular/animations
-  - 50.32  KB @angular/material
-  - 31.47  KB @angular/common
-  - 25.68  KB @angular/cdk
-  - 21.46  KB @angular/platform-browser
-  - 41.25  KB rxjs
-  - 68.69  KB src
-  - 7.39   KB unmapped
-  - 438.94 KB total
+  - 116.38  KB @angular/core
+  - 66.43   KB @angular/animations
+  - 50.32   KB @angular/material
+  - 31.47   KB @angular/common
+  - 25.68   KB @angular/cdk
+  - 21.46   KB @angular/platform-browser
+  - 41.25   KB rxjs
+  - 68.69   KB src
+  - 7.39    KB unmapped
+  - 438.94  KB total
 - diff (`-` means Ivy is smaller, `+` means Ivy is larger):  
-  - +13.91 KB @angular/core
-  - -0.20  KB @angular/animations
-  - +9.10  KB @angular/material
-  - +3.64  KB @angular/common
-  - +4.63  KB @angular/cdk
-  - +0.20  KB @angular/platform-browser
-  - +0.12  KB rxjs
-  - -11.83 KB src
-  - +3.25  KB unmapped
-  - +23.18 KB 
+  - +13.91  KB @angular/core
+  - -0.20   KB @angular/animations
+  - +9.10   KB @angular/material
+  - +3.64   KB @angular/common
+  - +4.63   KB @angular/cdk
+  - +0.20   KB @angular/platform-browser
+  - +0.12   KB rxjs
+  - -11.83  KB src
+  - +3.25   KB unmapped
+  - +23.18  KB total
 
 The end result is that code for user sources is smaller, but Angular libraries are bigger.
 
