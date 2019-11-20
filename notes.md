@@ -193,11 +193,11 @@ Primitives can't be renamed, so more of them means less opportunities for size s
 - strings: Ivy has 141, VE has 150, 
   - VE seems to have `"document"`, `"keydown.escape"`, `document:keydown.escape"`, `"document.click"`, and some others in generated code that Ivy doesn't
 
-## Differences between source maps
+### Differences between source maps
 
 For `api-api-list-module.js`, sourcemaps showed the following split:
 
-- dist-ivy (size on disk 8.0K)
+- dist-ivy/api-api-list-module.js
   - 2.5 KB api-list.component.ts
   - 1.23 KB api-list.component.html
   - 938 B api.service.ts
@@ -207,17 +207,7 @@ For `api-api-list-module.js`, sourcemaps showed the following split:
   - 65 B api-list.module.ts.pre-build-optimizer.js
   - 53 B api.service.ts.pre-build-optimizer.js
   - 6.22 KB total  
-- dist-ivy-beaut (size on disk 16K)
-  - 5.13 KB unmapped
-  - 3.24 KB api-list.component.ts
-  - 1.85 KB api-list.component.html
-  - 1.39 KB api-list.component.ts.pre-build-optimizer.js
-  - 1.25 KB api.service.ts
-  - 378 B api-list.module.ts
-  - 105 B api-list.module.ts.pre-build-optimizer.js
-  - 83 B api.service.ts.pre-build-optimizer.js
-  - 13.42 KB total
-- dist-ve (size on disk 12K)
+- dist-veapi-api-list-module-ngfactory.js
   - 3.28 KB api-list.component.html 
   - 2.41 KB api-list.component.ts
   - 846 B api.service.ts
@@ -226,16 +216,50 @@ For `api-api-list-module.js`, sourcemaps showed the following split:
   - 349 B unmapped
   - 53 B api-list.module.ts
   - 8.33 KB total  
-- dist-ve-beaut (size on disk 16K)
-  - 4.61 KB unmapped
-  - 4.35 KB api-list.component.html
-  - 3.04 KB api-list.component.ts
-  - 1.52 KB api-list.module.ngfactory.js.pre-build-optimizer.js
-  - 1.33 KB api-list.component.ngfactory.js.pre-build-optimizer.js
-  - 1.08 KB api.service.ts
-  - 118 B api-list.module.ts
-  - 16.05 KB total
+
 
 ## Ivy size increases
 
-`main.js` increases in size for Ivy by 20K.
+I tried to analyse the diffs for `main.js` (+23505) and found a couple of things.
+
+### Differences between source maps
+
+For `main.js`, sourcemaps showed the following split of toplevel contributors:
+
+- dist-ivy/main.js
+  - 130.29 KB @angular/core
+  - 66.23  KB @angular/animations
+  - 59.42  KB @angular/material
+  - 35.11  KB @angular/common
+  - 30.31  KB @angular/cdk
+  - 21.66  KB @angular/platform-browser
+  - 41.37  KB rxjs
+  - 56.86  KB src
+  - 10.64  KB unmapped
+  - 462.12 KB total  
+- dist-ve/main.js
+  - 116.38 KB @angular/core
+  - 66.43  KB @angular/animations
+  - 50.32  KB @angular/material
+  - 31.47  KB @angular/common
+  - 25.68  KB @angular/cdk
+  - 21.46  KB @angular/platform-browser
+  - 41.25  KB rxjs
+  - 68.69  KB src
+  - 7.39   KB unmapped
+  - 438.94 KB total
+- diff (`-` means Ivy is smaller, `+` means Ivy is larger):  
+  - +13.91 KB @angular/core
+  - -0.20  KB @angular/animations
+  - +9.10  KB @angular/material
+  - +3.64  KB @angular/common
+  - +4.63  KB @angular/cdk
+  - +0.20  KB @angular/platform-browser
+  - +0.12  KB rxjs
+  - -11.83 KB src
+  - +3.25  KB unmapped
+  - +23.18 KB 
+
+The end result is that code for user sources is smaller, but Angular libraries are bigger.
+
+### something, hopefully
