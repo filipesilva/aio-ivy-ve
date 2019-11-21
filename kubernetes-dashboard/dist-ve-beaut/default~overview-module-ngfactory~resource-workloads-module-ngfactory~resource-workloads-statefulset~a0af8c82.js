@@ -345,3 +345,4 @@
         }
     }
 } ]);
+//# sourceMappingURL=default~overview-module-ngfactory~resource-workloads-module-ngfactory~resource-workloads-statefulset~a0af8c82.js.map

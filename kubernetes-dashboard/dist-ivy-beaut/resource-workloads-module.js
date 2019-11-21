@@ -19,3 +19,4 @@
         })();
     }
 } ]);
+//# sourceMappingURL=resource-workloads-module.js.map

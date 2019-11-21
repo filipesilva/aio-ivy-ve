@@ -115,3 +115,4 @@
         }));
     }
 } ]);
+//# sourceMappingURL=resource-workloads-module-ngfactory.js.map

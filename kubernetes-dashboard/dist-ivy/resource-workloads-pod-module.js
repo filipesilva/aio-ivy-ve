@@ -1,1 +1,2 @@
 (window.webpackJsonp=window.webpackJsonp||[]).push([[29],{tr4B:function(n,e,o){"use strict";o.r(e),o.d(e,"PodModule",(function(){return c}));var t=o("PXUV"),r=o("MnlZ"),i=(o("aT70"),o("YkUv"),o("+/eE")),u=o("fXoL");let c=(()=>{class n{}return n.ɵmod=u["ɵɵdefineNgModule"]({type:n}),n.ɵinj=u["ɵɵdefineInjector"]({factory:function(e){return new(e||n)},imports:[[r.a,t.a,i.b]]}),n})()}}]);
+//# sourceMappingURL=resource-workloads-pod-module.js.map

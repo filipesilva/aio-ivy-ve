@@ -439,3 +439,4 @@
         }
     }
 } ]);
+//# sourceMappingURL=default~crd-module-ngfactory~resource-cluster-clusterrole-module-ngfactory~resource-cluster-namespac~db4b930a.js.map

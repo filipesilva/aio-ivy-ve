@@ -150,3 +150,4 @@
         })();
     }
 } ]);
+//# sourceMappingURL=resource-workloads-daemonset-module.js.map

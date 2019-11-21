@@ -337,3 +337,4 @@
         }));
     }
 } ]);
+//# sourceMappingURL=resource-cluster-clusterrole-module-ngfactory.js.map

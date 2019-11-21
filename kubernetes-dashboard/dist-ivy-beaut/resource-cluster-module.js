@@ -19,3 +19,4 @@
         })();
     }
 } ]);
+//# sourceMappingURL=resource-cluster-module.js.map

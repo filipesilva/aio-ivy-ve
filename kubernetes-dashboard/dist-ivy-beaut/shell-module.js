@@ -9411,3 +9411,4 @@
         exports.AddonManager = AddonManager;
     }
 } ]);
+//# sourceMappingURL=shell-module.js.map

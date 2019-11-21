@@ -154,3 +154,4 @@
         })();
     }
 } ]);
+//# sourceMappingURL=resource-discovery-service-module.js.map

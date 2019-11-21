@@ -181,3 +181,4 @@
         }));
     }
 } ]);
+//# sourceMappingURL=resource-discovery-ingress-module-ngfactory.js.map

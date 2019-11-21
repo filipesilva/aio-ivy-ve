@@ -268,3 +268,4 @@
         }));
     }
 } ]);
+//# sourceMappingURL=resource-config-module-ngfactory.js.map

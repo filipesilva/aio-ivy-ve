@@ -146,3 +146,4 @@
         })();
     }
 } ]);
+//# sourceMappingURL=resource-workloads-statefulset-module.js.map

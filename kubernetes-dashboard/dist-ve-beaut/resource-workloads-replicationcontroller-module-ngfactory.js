@@ -164,3 +164,4 @@
         }));
     }
 } ]);
+//# sourceMappingURL=resource-workloads-replicationcontroller-module-ngfactory.js.map

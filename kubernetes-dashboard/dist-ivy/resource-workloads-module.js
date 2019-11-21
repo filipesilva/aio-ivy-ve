@@ -1,1 +1,2 @@
 (window.webpackJsonp=window.webpackJsonp||[]).push([[28],{"1ZE1":function(n,e,o){"use strict";o.r(e),o.d(e,"WorkloadsModule",(function(){return c}));var r=o("PXUV"),t=o("MnlZ"),i=(o("/yQA"),o("6XRW")),u=o("fXoL");let c=(()=>{class n{}return n.ɵmod=u["ɵɵdefineNgModule"]({type:n}),n.ɵinj=u["ɵɵdefineInjector"]({factory:function(e){return new(e||n)},imports:[[t.a,r.a,i.b]]}),n})()}}]);
+//# sourceMappingURL=resource-workloads-module.js.map

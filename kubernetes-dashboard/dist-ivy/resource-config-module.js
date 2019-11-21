@@ -1,1 +1,2 @@
 (window.webpackJsonp=window.webpackJsonp||[]).push([[18],{ZEJq:function(n,e,o){"use strict";o.r(e),o.d(e,"ConfigModule",(function(){return c}));var t=o("PXUV"),r=o("MnlZ"),i=(o("TFoa"),o("g5tn")),u=o("fXoL");let c=(()=>{class n{}return n.ɵmod=u["ɵɵdefineNgModule"]({type:n}),n.ɵinj=u["ɵɵdefineInjector"]({factory:function(e){return new(e||n)},imports:[[r.a,t.a,i.b]]}),n})()}}]);
+//# sourceMappingURL=resource-config-module.js.map

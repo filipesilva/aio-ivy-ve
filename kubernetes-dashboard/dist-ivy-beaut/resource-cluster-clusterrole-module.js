@@ -98,3 +98,4 @@
         })();
     }
 } ]);
+//# sourceMappingURL=resource-cluster-clusterrole-module.js.map
