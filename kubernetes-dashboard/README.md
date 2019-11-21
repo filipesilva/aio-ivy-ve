@@ -782,3 +782,9 @@ export let ComponentsModule = /*@__PURE__*/ (() => {
 
 Even though we know all of these variables are now unused, they can't be removed because they are part of user code. 
 User code is not considered to be free from side effects, unlike library code.
+
+This seems to be the next level of https://github.com/angular/angular/pull/33337#issuecomment-552600420.
+
+In that issue we were trying to avoid keeping references to angular/* packages to avoid deoptimizations. By removing the references to angular packages, they are later elided by webpack itself because webpack knows angular packages are free from side effects.
+
+But these references can be to user code as well, and user code imports will not be elided because it is not free from side effects.
