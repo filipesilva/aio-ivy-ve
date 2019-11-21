@@ -188,95 +188,105 @@ $ du -acb --max-depth=1 ./dist-ve/*.js
 ```
 
 
-## Ivy size decreases
+## Ivy size changes
 
-I tried to analyse the diffs for `api-api-list-module.js` (-2101) and found a couple of things.
+Almost all the files decreased in size, except main which got larger.
 
-### Chained property access
+Looking at the sourcemaps for `./dist-ve/default~crd-module-ngfactory~overview-module-ngfactory~plugin-module-ngfactory~resource-cluster-clus~ab6b4aca.js` shows most of its size (24kb out of 31kb) comes from `@angular/material`, followed by 6kb of code in `src/app/frontend/common/components/list/`.
 
-Using repetitions of `[\w$]+\.[\w$]+` regex to find property accesses, whose names cannot be mangled, we can count how many there are.
+This application is structured in the following way: 
+- `SharedModule` contains many material imports
+- `ComponentsModule` contains application components based on Material
+- `LoginModule` is the only eagerly loaded NgModule, and loads both `SharedModule` and `ComponentsModule`
+- lots of lazy modules that also import `SharedModule` and `ComponentsModule`
 
-- `[\w$]+\.[\w$]+`: Ivy has 227, VE has 292
-- `[\w$]+\.[\w$]+\.[\w$]+`:, Ivy has 28, VE has 39
-- `[\w$]+\.[\w$]+\.[\w$]+\.[\w$]+`:, Ivy has 1, VE has 12
+In VE, `main.js` contains the base classes in `SharedModule` and `ComponentsModule`, but the ngfactories for them are in lazy modules. They seem to be loaded directly as needed. Factories for material components are in the lazy modules as well.
 
-More property accesses means less benefit from mangling. This should be the bulk of the size difference.
-
-### Primitive usage
-
-Primitives can't be renamed, so more of them means less opportunities for size savings.
-
-- `null`: Ivy has 2, VE has 140
-- `this`: Ivy has 70, VE has 70
-- `return`: Ivy has 13, VE has 14
-- strings: Ivy has 141, VE has 150, 
-  - VE seems to have `"document"`, `"keydown.escape"`, `document:keydown.escape"`, `"document.click"`, and some others in generated code that Ivy doesn't
-
-### Differences between source maps
-
-For `api-api-list-module.js`, sourcemaps showed the following split:
-
-- dist-ivy/api-api-list-module.js
-  - 2.5   KB api-list.component.ts
-  - 1.23  KB api-list.component.html
-  - 938   B api.service.ts
-  - 907   B api-list.component.ts.pre-build-optimizer.js
-  - 369   B unmapped
-  - 160   B api-list.module.ts
-  - 65    B api-list.module.ts.pre-build-optimizer.js
-  - 53    B api.service.ts.pre-build-optimizer.js
-  - 6.22  KB total  
-- dist-ve/api-api-list-module-ngfactory.js
-  - 3.28  KB api-list.component.html 
-  - 2.41  KB api-list.component.ts
-  - 846   B api.service.ts
-  - 743   B api-list.component.ngfactory.js.pre-build-optimizer.js
-  - 657   B api-list.module.ngfactory.js.pre-build-optimizer.js
-  - 349   B unmapped
-  - 53    B api-list.module.ts
-  - 8.33  KB total  
+In Ivy, `main.js` contains the base classes, and since base classes also contain factories in Ivy, the factories as well.
 
 
-## Ivy size increases
+In Ivy, the generated code for `ComponentsModule` looks like this:
+```
+    PXUV: function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        var shared_module = __webpack_require__("MnlZ"), core = (__webpack_require__("SyKJ"), 
+        __webpack_require__("WWzS"), __webpack_require__("is3B"), __webpack_require__("Bq+f"), 
+        __webpack_require__("yiZC"), __webpack_require__("R//s"), __webpack_require__("q8YL"), 
+        __webpack_require__("VjmB"), __webpack_require__("k9sD"), __webpack_require__("zWhM"), 
+        __webpack_require__("WcSx"), __webpack_require__("MaC/"), __webpack_require__("VL/P"), 
+        __webpack_require__("+kWh"), __webpack_require__("GFWA"), __webpack_require__("J9M6"), 
+        __webpack_require__("e5Yu"), __webpack_require__("Y4Kv"), __webpack_require__("TN1b"), 
+        __webpack_require__("usPk"), __webpack_require__("svQk"), __webpack_require__("/CJJ"), 
+        __webpack_require__("ZUgW"), __webpack_require__("y1Kn"), __webpack_require__("RMBR"), 
+        __webpack_require__("JPwO"), __webpack_require__("09Gj"), __webpack_require__("4Roa"), 
+        __webpack_require__("LH/c"), __webpack_require__("1+Xt"), __webpack_require__("rBIm"), 
+        __webpack_require__("8wem"), __webpack_require__("NaXA"), __webpack_require__("I3Np"), 
+        __webpack_require__("77sm"), __webpack_require__("B2Dn"), __webpack_require__("4uYH"), 
+        __webpack_require__("iKjI"), __webpack_require__("SBaI"), __webpack_require__("tdlU"), 
+        __webpack_require__("YS1y"), __webpack_require__("TsCr"), __webpack_require__("H2iN"), 
+        __webpack_require__("Rx8Q"), __webpack_require__("fXoL"));
+        __webpack_require__("MZ8+"), __webpack_require__("1iBD"), __webpack_require__("Zv2W"), 
+        __webpack_require__("5Dfj"), __webpack_require__("/CiT"), __webpack_require__("9V1o"), 
+        __webpack_require__("RzvL"), __webpack_require__("hbcI"), __webpack_require__("D3Y/"), 
+        __webpack_require__("MmPu"), __webpack_require__("pboN"), __webpack_require__("Rkdh"), 
+        __webpack_require__("QuVQ"), __webpack_require__("wGc6"), __webpack_require__("+it7"), 
+        __webpack_require__("H082"), __webpack_require__("l/kb"), __webpack_require__("D5Vd"), 
+        __webpack_require__("ZonX"), __webpack_require__("JJm4"), __webpack_require__("GXVr"), 
+        __webpack_require__("0t1c"), __webpack_require__("mhPB"), __webpack_require__("Kykq"), 
+        __webpack_require__("hdER"), __webpack_require__("1nyB"), __webpack_require__("GCPd"), 
+        __webpack_require__("PCAo"), __webpack_require__("zT9v"), __webpack_require__("/p1U"), 
+        __webpack_require__.d(__webpack_exports__, "a", (function() {
+            return module_ComponentsModule;
+        }));
+        let module_ComponentsModule = (() => {
+            class ComponentsModule {}
+            return ComponentsModule.ɵmod = core["ɵɵdefineNgModule"]({
+                type: ComponentsModule
+            }), ComponentsModule.ɵinj = core["ɵɵdefineInjector"]({
+                factory: function(t) {
+                    return new (t || ComponentsModule);
+                },
+                imports: [ [ shared_module.a ] ]
+            }), ComponentsModule;
+        })();
+    },
+```
 
-I tried to analyse the diffs for `main.js` (+23505) and found a couple of things.
+It is similar to the VE version:
+```
+   PXUV: function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        __webpack_require__("SyKJ"), __webpack_require__("WWzS"), __webpack_require__("is3B"), 
+        __webpack_require__("Bq+f"), __webpack_require__("yiZC"), __webpack_require__("R//s"), 
+        __webpack_require__("q8YL"), __webpack_require__("VjmB"), __webpack_require__("k9sD"), 
+        __webpack_require__("zWhM"), __webpack_require__("WcSx"), __webpack_require__("MaC/"), 
+        __webpack_require__("VL/P"), __webpack_require__("+kWh"), __webpack_require__("GFWA"), 
+        __webpack_require__("J9M6"), __webpack_require__("e5Yu"), __webpack_require__("Y4Kv"), 
+        __webpack_require__("TN1b"), __webpack_require__("usPk"), __webpack_require__("svQk"), 
+        __webpack_require__("/CJJ"), __webpack_require__("ZUgW"), __webpack_require__("y1Kn"), 
+        __webpack_require__("RMBR"), __webpack_require__("JPwO"), __webpack_require__("09Gj"), 
+        __webpack_require__("4Roa"), __webpack_require__("LH/c"), __webpack_require__("1+Xt"), 
+        __webpack_require__("rBIm"), __webpack_require__("8wem"), __webpack_require__("NaXA"), 
+        __webpack_require__("I3Np"), __webpack_require__("77sm"), __webpack_require__("B2Dn"), 
+        __webpack_require__("4uYH"), __webpack_require__("iKjI"), __webpack_require__("SBaI"), 
+        __webpack_require__("tdlU"), __webpack_require__("YS1y"), __webpack_require__("TsCr"), 
+        __webpack_require__("H2iN"), __webpack_require__("Rx8Q"), __webpack_require__("MZ8+"), 
+        __webpack_require__("1iBD"), __webpack_require__("Zv2W"), __webpack_require__("5Dfj"), 
+        __webpack_require__("/CiT"), __webpack_require__("9V1o"), __webpack_require__("RzvL"), 
+        __webpack_require__("hbcI"), __webpack_require__("D3Y/"), __webpack_require__("MmPu"), 
+        __webpack_require__("pboN"), __webpack_require__("Rkdh"), __webpack_require__("QuVQ"), 
+        __webpack_require__("wGc6"), __webpack_require__("+it7"), __webpack_require__("H082"), 
+        __webpack_require__("l/kb"), __webpack_require__("D5Vd"), __webpack_require__("ZonX"), 
+        __webpack_require__("JJm4"), __webpack_require__("GXVr"), __webpack_require__("0t1c"), 
+        __webpack_require__("mhPB"), __webpack_require__("Kykq"), __webpack_require__("hdER"), 
+        __webpack_require__("1nyB"), __webpack_require__("GCPd"), __webpack_require__("PCAo"), 
+        __webpack_require__("zT9v"), __webpack_require__("/p1U"), __webpack_require__.d(__webpack_exports__, "a", (function() {
+            return ComponentsModule;
+        }));
+        class ComponentsModule {}
+    },
+```
 
-### Differences between source maps
+It is puzzling that all these imports are left in place when unused. 
 
-For `main.js`, sourcemaps showed the following split of toplevel contributors:
-
-- dist-ivy/main.js
-  - 130.29  KB @angular/core
-  - 66.23   KB @angular/animations
-  - 59.42   KB @angular/material
-  - 35.11   KB @angular/common
-  - 30.31   KB @angular/cdk
-  - 21.66   KB @angular/platform-browser
-  - 41.37   KB rxjs
-  - 56.86   KB src
-  - 10.64   KB unmapped
-  - 462.12  KB total
-- dist-ve/main.js
-  - 116.38  KB @angular/core
-  - 66.43   KB @angular/animations
-  - 50.32   KB @angular/material
-  - 31.47   KB @angular/common
-  - 25.68   KB @angular/cdk
-  - 21.46   KB @angular/platform-browser
-  - 41.25   KB rxjs
-  - 68.69   KB src
-  - 7.39    KB unmapped
-  - 438.94  KB total
-- diff (`-` means Ivy is smaller, `+` means Ivy is larger):  
-  - +13.91  KB @angular/core
-  - -0.20   KB @angular/animations
-  - +9.10   KB @angular/material
-  - +3.64   KB @angular/common
-  - +4.63   KB @angular/cdk
-  - +0.20   KB @angular/platform-browser
-  - +0.12   KB rxjs
-  - -11.83  KB src
-  - +3.25   KB unmapped
-  - +23.18  KB total
-
-The end result is that code for user sources is smaller, but Angular libraries are bigger.
+It's likely that one of the code transformations in Angular CLI is removing the decorators and thus references, but leaving the imports behind.
