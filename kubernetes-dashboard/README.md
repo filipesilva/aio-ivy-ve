@@ -788,3 +788,6 @@ This seems to be the next level of https://github.com/angular/angular/pull/33337
 In that issue we were trying to avoid keeping references to angular/* packages to avoid deoptimizations. By removing the references to angular packages, they are later elided by webpack itself because webpack knows angular packages are free from side effects.
 
 But these references can be to user code as well, and user code imports will not be elided because it is not free from side effects.
+
+The end result thus is:
+In Ivy, all modules that are eagerly imported will be included in wholesale main. In VE, the modules themselves would be included but their factories would only be included where used.
