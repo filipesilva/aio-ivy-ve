@@ -190,3 +190,101 @@ For `main.js`, sourcemaps showed the following split of toplevel contributors:
   - +23.18  KB total
 
 The end result is that code for user sources is smaller, but Angular libraries are bigger.
+
+
+## Builds without lazy chunks
+
+In order to better analyse what changed between modules we can eagerly load the lazy modules.
+
+This helps on a couple of fronts:
+- we know that lazy chunks can be a source of hard to debug deoptimizations.
+- the best case scenario for tree-shaking is a single large module.
+- having all app code in a single module gives us a toplevel picture of library usage through source maps.
+
+We can make eagerly load the lazy chunks by adding the following code to the top of `src/app/custom-elements/element-registry.ts` that directly imports the same thing that the `import()` statements would import:
+
+- for Ivy builds import the modules directly
+```
+import { AnnouncementBarModule } from './announcement-bar/announcement-bar.module';
+import { ApiListModule } from './api/api-list.module';
+import { ContributorListModule } from './contributor/contributor-list.module';
+import { FileNotFoundSearchModule } from './search/file-not-found-search.module';
+import { ResourceListModule } from './resource/resource-list.module';
+import { TocModule } from './toc/toc.module';
+import { CodeExampleModule } from './code/code-example.module';
+import { CodeTabsModule } from './code/code-tabs.module';
+import { LiveExampleModule } from './live-example/live-example.module';
+
+console.log(AnnouncementBarModule);
+console.log(ApiListModule);
+console.log(ContributorListModule);
+console.log(FileNotFoundSearchModule);
+console.log(ResourceListModule);
+console.log(TocModule);
+console.log(CodeExampleModule);
+console.log(CodeTabsModule);
+console.log(LiveExampleModule);
+```
+- for VE builds import the module ngfactories
+```
+import { AnnouncementBarModuleNgFactory } from './announcement-bar/announcement-bar.module.ngfactory';
+import { ApiListModuleNgFactory } from './api/api-list.module.ngfactory';
+import { ContributorListModuleNgFactory } from './contributor/contributor-list.module.ngfactory';
+import { FileNotFoundSearchModuleNgFactory } from './search/file-not-found-search.module.ngfactory';
+import { ResourceListModuleNgFactory } from './resource/resource-list.module.ngfactory';
+import { TocModuleNgFactory } from './toc/toc.module.ngfactory';
+import { CodeExampleModuleNgFactory } from './code/code-example.module.ngfactory';
+import { CodeTabsModuleNgFactory } from './code/code-tabs.module.ngfactory';
+import { LiveExampleModuleNgFactory } from './live-example/live-example.module.ngfactory';
+
+console.log(AnnouncementBarModuleNgFactory);
+console.log(ApiListModuleNgFactory);
+console.log(ContributorListModuleNgFactory);
+console.log(FileNotFoundSearchModuleNgFactory);
+console.log(ResourceListModuleNgFactory);
+console.log(TocModuleNgFactory);
+console.log(CodeExampleModuleNgFactory);
+console.log(CodeTabsModuleNgFactory);
+console.log(LiveExampleModuleNgFactory);
+```
+
+Then we create the same 4 builds as before, but we call them `dist-*-nolazy-*` instead.
+
+- Ivy
+```
+$ du -acb --max-depth=1 ./dist-ivy-nolazy/*.js
+31037   ./dist-nolazy-ivy/0.worker.js
+14918   ./dist-nolazy-ivy/assets-js-prettify-js.js
+581054  ./dist-nolazy-ivy/main.js
+141320  ./dist-nolazy-ivy/ngsw-worker.js
+52474   ./dist-nolazy-ivy/polyfills.js
+2309    ./dist-nolazy-ivy/runtime.js
+519     ./dist-nolazy-ivy/safety-worker.js
+519     ./dist-nolazy-ivy/worker-basic.min.js
+824150  total
+```
+- VE
+```
+$ du -acb --max-depth=1 ./dist-ve-nolazy/*.js
+31037   ./dist-nolazy-ve/0.worker.js
+14918   ./dist-nolazy-ve/assets-js-prettify-js.js
+568114  ./dist-nolazy-ve/main.js
+141320  ./dist-nolazy-ve/ngsw-worker.js
+52474   ./dist-nolazy-ve/polyfills.js
+2309    ./dist-nolazy-ve/runtime.js
+519     ./dist-nolazy-ve/safety-worker.js
+519     ./dist-nolazy-ve/worker-basic.min.js
+811210  total
+```
+- diff (`-` means Ivy is smaller, `+` means Ivy is larger):
+```
+0       ./dist-nolazy-ivy/0.worker.js
+0       ./dist-nolazy-ivy/assets-js-prettify-js.js
++12940  ./dist-nolazy-ivy/main.js
+0       ./dist-nolazy-ivy/ngsw-worker.js
+0       ./dist-nolazy-ivy/polyfills.js
+0       ./dist-nolazy-ivy/runtime.js
+0       ./dist-nolazy-ivy/safety-worker.js
+0       ./dist-nolazy-ivy/worker-basic.min.js
++12940  total
+```
