@@ -432,7 +432,9 @@ I can't correctly ascertain if the retained code is as expected, but have extrac
 
 Aside from material, the angular common also showed a noteworthy increase in Ivy of 3.64 KB, from 31.47 to 35.11. I extracted samples to `extracted-samples/common-ivy.js` and `common-ve.js`. 
 
-One large addition in Ivy seems to be the `StylingDiffer` class, that is not present in VE. Many classes are larger due to also containing `ɵfac` methods, like the angular/service-worker case.
+One large addition in Ivy seems to be the `StylingDiffer` class, that is not present in VE. 
+
+Many classes are larger due to also containing `ɵfac` and `ɵdir` and methods, much like the angular/service-worker case.
 
 `PlatformLocation`, `BrowserPlatformLocation`, `LocationStrategy`, and `Location` contain double `ɵprov` methods in Ivy, one of which also present in VE:
 - Ivy
