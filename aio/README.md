@@ -200,6 +200,7 @@ This helps on a couple of fronts:
 - we know that lazy chunks can be a source of hard to debug deoptimizations.
 - the best case scenario for tree-shaking is a single large module.
 - having all app code in a single module gives us a toplevel picture of library usage through source maps.
+- diffing code is easier because there's less module loading noise.
 
 We can make eagerly load the lazy chunks by adding the following code to the top of `src/app/custom-elements/element-registry.ts` that directly imports the same thing that the `import()` statements would import:
 
@@ -288,3 +289,213 @@ $ du -acb --max-depth=1 ./dist-ve-nolazy/*.js
 0       ./dist-nolazy-ivy/worker-basic.min.js
 +12940  total
 ```
+
+We can also look at the sourcemap differences for main and get the full picture of dependency sizes:
+
+- dist-ivy-nolazy/main.js
+```
+130.29  KB @angular/core
+101.02  KB @angular/material
+68.99   KB @angular/cdk
+66.23   KB @angular/animations
+35.11   KB @angular/common
+21.66   KB @angular/platform-browser
+5.11    KB @angular/elements
+4.89    KB @angular/service-worker
+42.22   KB rxjs
+90.71   KB src
+14.11   KB unmapped
+580.57  KB total
+```  
+- dist-ve-nolazy/main.js
+```
+116.38  KB @angular/core
+90.76   KB @angular/material
+66.43   KB @angular/animations
+65.17   KB @angular/cdk
+31.47   KB @angular/common
+21.46   KB @angular/platform-browser
+5.11    KB @angular/elements
+4.52    KB @angular/service-worker 
+42.11   KB rxjs
+114.24  KB src
+10.2    KB unmapped
+568.08  KB total
+```
+- diff (`-` means Ivy is smaller, `+` means Ivy is larger):  
+```
++13.91  KB @angular/core
++10.26  KB @angular/material
++3.82   KB @angular/cdk
+-0.2    KB @angular/animations
++3.64   KB @angular/common
++0.2    KB @angular/platform-browser
+0       KB @angular/elements
++0.37   KB @angular/service-worker
++0.11   KB rxjs
+-23.53  KB src
++3.91   KB unmapped
++12.49  KB total
+```
+
+In comparison with the lazy load builds, sizes for material, cdk, and src increase. elements and service-worker is included. The rest mostly stay the same. 
+Thus we can see a similar effect as before: src is smaller in Ivy but libraries are larger.
+
+A good way to visualize what parts of the bundle correspont to original modules is to drag both the `.js` and `.js.map` files to http://sokra.github.io/source-map-visualization/. 
+Unfortunately, this doesn't seem to fully load the beautified files. The production bundles display correctly though.
+
+Below I have some specific modules for which I extracted samples. A good way to diff them is to use VSCode's "Compare active file with..." command. That will display a side-by-side diff of the whole files.
+
+### angular/service-worker size increase
+
+On small change that stood out was the size increase for angular/service-worker. It goes up 0.37KB in Ivy, from 4.52 to 4.89KB.
+I use the source-map-visualization to identify what code was part of the service-worker module and extracted the beautified version into `extracted-samples/sw-ivy.js` and `sw-ve.js` .
+
+This size increase seems to be due to factories:
+
+- Ivy
+```
+        let service_worker_ServiceWorkerModule = (() => {
+            class ServiceWorkerModule {
+                static register(script, opts = {}) {
+                    return {
+                        ngModule: ServiceWorkerModule,
+                        providers: [ {
+                            provide: SCRIPT,
+                            useValue: script
+                        }, {
+                            provide: SwRegistrationOptions,
+                            useValue: opts
+                        }, {
+                            provide: service_worker_NgswCommChannel,
+                            useFactory: ngswCommChannelFactory,
+                            deps: [ SwRegistrationOptions, core.A ]
+                        }, {
+                            provide: core.d,
+                            useFactory: ngswAppInitializer,
+                            deps: [ core.q, SCRIPT, SwRegistrationOptions, core.A ],
+                            multi: !0
+                        } ]
+                    };
+                }
+            }
+            return ServiceWorkerModule.ɵmod = core.Nb({
+                type: ServiceWorkerModule
+            }), ServiceWorkerModule.ɵinj = core.Mb({
+                factory: function(t) {
+                    return new (t || ServiceWorkerModule);
+                },
+                providers: [ service_worker_SwPush, service_worker_SwUpdate ]
+            }), ServiceWorkerModule;
+        })();
+```
+- VE
+```
+        class service_worker_ServiceWorkerModule {
+            static register(script, opts = {}) {
+                return {
+                    ngModule: service_worker_ServiceWorkerModule,
+                    providers: [ {
+                        provide: SCRIPT,
+                        useValue: script
+                    }, {
+                        provide: SwRegistrationOptions,
+                        useValue: opts
+                    }, {
+                        provide: service_worker_NgswCommChannel,
+                        useFactory: ngswCommChannelFactory,
+                        deps: [ SwRegistrationOptions, core.A ]
+                    }, {
+                        provide: core.d,
+                        useFactory: ngswAppInitializer,
+                        deps: [ core.q, SCRIPT, SwRegistrationOptions, core.A ],
+                        multi: !0
+                    } ]
+                };
+            }
+        }
+```
+
+
+### angular/material tabs
+
+The angular material tabs module is the largest material module used in AIO.
+
+In VE it consists of the main tabs.js file (13.6 KB) plus tabs/index.ngfactory.js (14.18) for a total of 27.78 KB. In Ivy it consists of a single module of 29.36 KB.
+
+It seems to consist mostly of templates, and thus I expected it to be smaller in Ivy. It is larger instead.
+
+I can't correctly ascertain if the retained code is as expected, but have extracted it into `extracted-samples/mat-tab-ivy.js` and `mat-tab-ve.js`.
+
+
+### angular/common
+
+Aside from material, the angular common also showed a noteworthy increase in Ivy of 3.64 KB, from 31.47 to 35.11. I extracted samples to `extracted-samples/common-ivy.js` and `common-ve.js`. 
+
+One large addition in Ivy seems to be the `StylingDiffer` class, that is not present in VE. Many classes are larger due to also containing `ɵfac` methods, like the angular/service-worker case.
+
+`PlatformLocation`, `BrowserPlatformLocation`, `LocationStrategy`, and `Location` contain double `ɵprov` methods in Ivy, one of which also present in VE:
+- Ivy
+```
+        let PlatformLocation = (() => {
+            class PlatformLocation {}
+            return PlatformLocation.ɵfac = function(t) {
+                return new (t || PlatformLocation);
+            }, PlatformLocation.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_0__.Lb({
+                token: PlatformLocation,
+                factory: function() {
+                    return useBrowserPlatformLocation();
+                },
+                providedIn: "platform"
+            }), PlatformLocation.ɵprov = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__.Lb)({
+                factory: useBrowserPlatformLocation,
+                token: PlatformLocation,
+                providedIn: "platform"
+            }), PlatformLocation;
+        })();
+```
+- VE
+```
+        let PlatformLocation = (() => {
+            class PlatformLocation {}
+            return PlatformLocation.ɵprov = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__.Yb)({
+                factory: useBrowserPlatformLocation,
+                token: PlatformLocation,
+                providedIn: "platform"
+            }), PlatformLocation;
+        })();
+```
+
+
+### AIO LocationService
+
+While extracting samples I noticed that it's in an isolated Webpack closure mode. I expected it to have been concatenated into the rest of the Angular modules. For that matter, angular core and others also seem to be in their own scopes as shown in the webpack module loaders below:
+
+- Ivy
+```
+    "/lUL": function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        __webpack_require__.d(__webpack_exports__, "a", (function() {
+            return LocationService;
+        }));
+        var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("jtHE"), rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("lJxs"), rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("vkgz"), _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("fXoL"), app_shared_ga_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("4MUX"), _angular_common__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("ofXK"), _scroll_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("Faly"), app_sw_updates_sw_updates_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("iL+y");
+        let LocationService = (() => {
+            class LocationService {
+```
+- VE
+```
+    "/lUL": function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        __webpack_require__.d(__webpack_exports__, "a", (function() {
+            return LocationService;
+        }));
+        var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("jtHE"), rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("lJxs"), rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("vkgz");
+        class LocationService {
+```
+
+I extracted the samples to `extracted-samples/location-service-ivy.js` and `location-service-ve.js`. 
+There I could see that the Ivy `LocationService.ɵfac` did make use of all these imports, whereas the VE version did not have such a thing.
+
+I could also confirm that elsewhere in the VE bundle I could see angular/core had it's own module scope.
+At first I thought this happened because, while adding static imports to prevent lazy modules, I still left in there the dynamic imports.
+This bears further scrutiny as to the cause of the deoptimization. We can figure out the why it wasn't concatenated by running a verbose build.
