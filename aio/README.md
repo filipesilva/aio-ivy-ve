@@ -562,7 +562,7 @@ This example seems to point towards Ivy containg factories that VE does not.
 
 ### material/button and material/card
 
-The material/button and material/card modules both have very small factory-to-class ratios in VE. Like material/tabs, both seem to consist mostly of templates, and thus I expected them to be smaller in Ivy.
+The material/button and material/card modules both have very large factory-to-class ratios in VE. Like material/tabs, both seem to consist mostly of templates, and thus I expected them to be smaller in Ivy.
 
 I extracted samples to `extracted-samples/button-ivy.js` and `button-ve.js`, plus `extracted-samples/card-ivy.js` and `card-ve.js`
 
