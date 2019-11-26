@@ -509,3 +509,53 @@ angular/core has an increase in Ivy of 13.91 KB, from 116.38 to 130.29 KB. I ext
 
 I couldn't reach any conclusions from this aside that angular/core in Ivy has more code to start with than in VE. It seems to mostly be function declarations. 
 There didn't see to be a lot of generated code, but there's still extra `ɵfac` and `ɵprov` as usual.
+
+
+### material/toolbar
+
+The angular material toolbar module is the smallest material module used in AIO.
+
+In VE it consists of the main toolbar.js file (851 B) plus toolbar/index.ngfactory.js (698 B) for a total of 1.55 KB. In Ivy it consists of a single module of 2.37 KB.
+
+Like material/tabs, it seems to consist mostly of templates, and thus I expected it to be smaller in Ivy. It is larger instead.
+
+I have extracted it into `extracted-samples/mat-toolbar-ivy.js` and `mat-toolbar-ve.js`.
+
+There is one notable detail that is not visible in the samples, but is visible in the source mappings (via http://sokra.github.io/source-map-visualization/).
+The VE sample is missing the `MatToolbarNgFactory` below:
+
+```
+var MatToolbarNgFactory = i0.ɵccf("mat-toolbar", i1.MatToolbar, View_MatToolbar_Host_0, { color: "color" }, {}, ["*", "mat-toolbar-row"]);
+```
+
+According to sourcemaps, this declaration seems to be completely gone.
+`MatToolbar.ɵfac` however, which I assume to be equivalent Ivy declaration, is present in the Ivy sample.
+
+Using that knowledge I looked for more instances of the `"mat-toolbar-row"` string as a reference to this code, since it shouldn't be altered by minification.
+Ivy has 5 references to `"mat-toolbar-row"` in the sample, whereas VE only has 1. In the whole bundle, Ivy has 7 references, whereas VE only has 4.
+
+This in turn leads to the `MatToolbarRow` class.
+In Ivy it is present in the sample as follows:
+```
+        let toolbar_MatToolbarRow = (() => {
+            class MatToolbarRow {}
+            return MatToolbarRow.ɵfac = function(t) {
+                return new (t || MatToolbarRow);
+            }, MatToolbarRow.ɵdir = core.Kb({
+                type: MatToolbarRow,
+                selectors: [ [ "mat-toolbar-row" ] ],
+                hostBindings: function(rf, ctx, elIndex) {
+                    1 & rf && core.Ub(toolbar_c0);
+                },
+                exportAs: [ "matToolbarRow" ]
+            }), MatToolbarRow;
+```
+
+In VE the only reference I find is an empty class with no corresponding factory.
+```
+class MatToolbarRow {}
+```
+
+The VE sourcemaps also do not reference `MatToolbarRowNgFactory`.
+
+This example seems to point towards Ivy containg factories that VE does not.
