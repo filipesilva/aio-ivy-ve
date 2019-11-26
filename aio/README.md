@@ -501,3 +501,11 @@ There I could see that the Ivy `LocationService.ɵfac` did make use of all these
 I could also confirm that elsewhere in the VE bundle I could see angular/core had it's own module scope.
 At first I thought this happened because, while adding static imports to prevent lazy modules, I still left in there the dynamic imports.
 This bears further scrutiny as to the cause of the deoptimization. We can figure out the why it wasn't concatenated by running a verbose build.
+
+
+### angular/core
+
+angular/core has an increase in Ivy of 13.91 KB, from 116.38 to 130.29 KB. I extracted samples to `extracted-samples/core-ivy.js` and `core-ve.js`.
+
+I couldn't reach any conclusions from this aside that angular/core in Ivy has more code to start with than in VE. It seems to mostly be function declarations. 
+There didn't see to be a lot of generated code, but there's still extra `ɵfac` and `ɵprov` as usual.
